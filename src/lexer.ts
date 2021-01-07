@@ -4,7 +4,7 @@ import { Token, TokenType } from './tokens'
 
 const alphabetic = /[a-zA-Z]/
 const number = /(\d|\.)/
-const specialChar = /[^A-Za-z0-9]/
+const specialChar = /[^A-Za-z0-9\s]/
 
 export class Lexer {
   private pos: Position
