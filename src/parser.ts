@@ -83,8 +83,6 @@ export class Parser {
 
         throw new UnkownOperatorError(token)
     }
-
-    console.log()
   }
 
   private get lastOperation (): Operation {

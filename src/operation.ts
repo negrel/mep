@@ -21,7 +21,7 @@ export class Func extends Operation {
 
 // Basic functions
 OPERATIONS.set('log', new Func((...args: number[]) => Math.log10(args[0])))
-OPERATIONS.set('powten', new Func((...args: number[]) => 10 ** args[0]))
+OPERATIONS.set('pow10', new Func((...args: number[]) => 10 ** args[0]))
 
 OPERATIONS.set('ln', new Func((...args: number[]) => Math.log(args[0])))
 OPERATIONS.set('exp', new Func((...args: number[]) => Math.exp(args[0])))
@@ -35,13 +35,13 @@ OPERATIONS.set('arccos', new Func((...args: number[]) => Math.acos(args[0])))
 OPERATIONS.set('tan', new Func((...args: number[]) => Math.tan(args[0])))
 OPERATIONS.set('arctan', new Func((...args: number[]) => Math.atan(args[0])))
 
-OPERATIONS.set('powtwo', new Func((...args: number[]) => args[0] ** 2))
+OPERATIONS.set('pow2', new Func((...args: number[]) => args[0] ** 2))
 OPERATIONS.set('sqrt', new Func((...args: number[]) => Math.sqrt(args[0])))
 
-OPERATIONS.set('fac', new Func((...args: number[]) => factorial(args[0])))
 function factorial (a: number): number {
   return a <= 0 ? 1 : a * factorial(a - 1)
 }
+OPERATIONS.set('fac', new Func((...args: number[]) => factorial(args[0])))
 
 OPERATIONS.set('max', new Func((...args: number[]) => Math.max(...args)))
 OPERATIONS.set('min', new Func((...args: number[]) => Math.min(...args)))
