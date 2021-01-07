@@ -1,17 +1,16 @@
-import { Lexer } from './lexer';
-import { Operation, Operator } from './operation';
-import { Parser } from './parser';
+import { Operation, Operator } from './operation'
+import { Parser } from './parser'
 
 export class UnsupportedTypeForComputeError extends Error {
-  constructor(op: any) {
-    super(`can't compute "${op}" of type ${op.constructor.name}.`)
+  constructor (op: string, type: string) {
+    super(`can't compute "${op}" of type ${type}.`)
   }
 }
 
-function computeRPN(rpn: Array<Number|number|Operation>): number {
+function computeRPN (rpn: Array<number|number|Operation>): number {
   const op = rpn.pop()
   if (op === undefined) {
-    return 0;
+    return 0
   }
 
   if (op instanceof Operator) {
@@ -19,21 +18,21 @@ function computeRPN(rpn: Array<Number|number|Operation>): number {
     const left = computeRPN(rpn)
 
     return op.do(left, right)
-  } else if (typeof op === 'number' || op.constructor.name == 'Number') {
+  } else if (typeof op === 'number' || op.constructor.name === 'Number') {
     return op as number
   } else {
-    throw new UnsupportedTypeForComputeError(op)
+    throw new UnsupportedTypeForComputeError(
+      JSON.stringify(op), op.constructor.name
+    )
   }
 }
 
-function compute(calcul: string): number {
+function compute (calcul: string): number {
   const rpn = Parser.parse(calcul)
   return computeRPN(rpn)
 }
 
-export const mep = {
-  Lexer: Lexer,
-  Parser: Parser,
-  compute: compute
-}
-export default mep;
+export default compute
+export { Lexer } from './lexer'
+export { Parser } from './parser'
+export { Token, TokenType } from './tokens'
