@@ -25,6 +25,19 @@ export class Lexer {
     this.pos++
   }
 
+  static lex(src: string): Token[] {
+    const lexer = new Lexer(src)
+    const tokens: Token[] = [];
+
+    let token;
+    do {
+      token = lexer.lex()
+      tokens.push(token)
+    } while(token.type != TokenType.EOF)
+
+    return tokens
+  }
+
   lex (): Token {
     while (true) {
       this.readChar()

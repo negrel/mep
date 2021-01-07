@@ -2,6 +2,7 @@
 import { Constant, CONSTANTS } from './constant'
 import { Token, TokenType } from './tokens'
 import { OPERATIONS, Operation, Operator, Parenthesis } from './operation'
+import { Lexer } from './lexer'
 
 class InvalidTokenError extends Error {
   constructor (token: Token) {
@@ -34,6 +35,17 @@ export class Parser {
   constructor () {
     this.output = []
     this.operation = []
+  }
+
+  static parse (expr: string): Array<Constant|number|Operation> {
+    const tokens = Lexer.lex(expr)
+    const parser = new Parser()
+
+    while(tokens.length != 0) {
+      parser.parse(tokens.pop() as Token)
+    }
+
+    return parser.result
   }
 
   parse (token: Token): void {

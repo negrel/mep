@@ -80,6 +80,7 @@ class InvalidOperationCallError extends Error {
   }
 }
 
+// Parenthesis are stored on the stack operator
 export class Parenthesis extends Operation {
   readonly isLeft: boolean
 
@@ -93,6 +94,5 @@ export class Parenthesis extends Operation {
   }
 }
 
-// Parenthesis are stored on the stack operator
 OPERATIONS.set('(', new Parenthesis(true))
 OPERATIONS.set(')', new Parenthesis(false))
