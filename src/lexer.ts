@@ -1,4 +1,4 @@
-import { Func } from './operation'
+import { INVALIDS } from './invalid'
 import { Position } from './position'
 import { Token, TokenType } from './tokens'
 
@@ -25,15 +25,15 @@ export class Lexer {
     this.pos++
   }
 
-  static lex(src: string): Token[] {
+  static lex (src: string): Token[] {
     const lexer = new Lexer(src)
-    const tokens: Token[] = [];
+    const tokens: Token[] = []
 
-    let token;
+    let token
     do {
       token = lexer.lex()
       tokens.push(token)
-    } while(token.type != TokenType.EOF)
+    } while (token.type !== TokenType.EOF)
 
     return tokens
   }
@@ -43,7 +43,7 @@ export class Lexer {
       this.readChar()
 
       switch (true) {
-        case this.char == '':
+        case this.char === '':
           return {
             type: TokenType.EOF,
             start: this.pos,
@@ -54,7 +54,7 @@ export class Lexer {
         case INVALIDS.has(this.char):
           continue
 
-        case specialChar.test(this.char):
+        case alphabetic.test(this.char):
           return this.lexIdent()
 
         case number.test(this.char) || (this.char === '.' && number.test(this.peek)):
@@ -63,24 +63,24 @@ export class Lexer {
         case this.char === '(':
           return {
             type: TokenType.LPAREN,
-            start: this.pos,
-            end: this.pos + 1,
+            start: this.pos - 1,
+            end: this.pos,
             value: this.char
           }
 
         case this.char === ')':
           return {
             type: TokenType.RPAREN,
-            start: this.pos,
-            end: this.pos + 1,
+            start: this.pos - 1,
+            end: this.pos,
             value: this.char
           }
 
         case specialChar.test(this.char):
           return {
             type: TokenType.OPERATOR,
-            start: this.pos,
-            end: this.pos + 1,
+            start: this.pos - 1,
+            end: this.pos,
             value: this.char
           }
 
@@ -98,16 +98,16 @@ export class Lexer {
   private lexIdent (): Token {
     const result: Token = {
       type: TokenType.IDENT,
-      start: this.pos,
-      end: this.pos + 1,
+      start: this.pos - 1,
+      end: 0,
       value: this.char
     }
 
     while (alphabetic.test(this.peek) || /\d/.test(this.peek)) {
       this.readChar()
       result.value += this.char
-      result.end++
     }
+    result.end = this.pos
 
     return result
   }
@@ -115,7 +115,7 @@ export class Lexer {
   private lexNumber (): Token {
     const result: Token = {
       type: TokenType.NUMBER,
-      start: this.pos,
+      start: this.pos - 1,
       end: 0,
       value: this.char
     }
@@ -129,7 +129,7 @@ export class Lexer {
       this.readChar()
       result.value += this.char
     }
-    result.end = this.pos + 1
+    result.end = this.pos
 
     return result
   }
