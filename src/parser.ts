@@ -41,7 +41,7 @@ export class Parser {
     const tokens = Lexer.lex(expr)
     const parser = new Parser()
 
-    while(tokens.length != 0) {
+    while (tokens.length !== 0) {
       parser.parse(tokens.pop() as Token)
     }
 
