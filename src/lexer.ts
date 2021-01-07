@@ -1,9 +1,10 @@
+import { Func } from './operation'
 import { Position } from './position'
 import { Token, TokenType } from './tokens'
 
 const alphabetic = /[a-zA-Z]/
 const number = /(\d|\.)/
-const specialChar = /[<>!@#$%/^&*+=_-]/
+const specialChar = /[^A-Za-z0-9]/
 
 export class Lexer {
   private pos: Position
@@ -28,20 +29,19 @@ export class Lexer {
     while (true) {
       this.readChar()
 
-      if (this.char === '') {
-        return {
-          type: TokenType.EOF,
-          start: this.pos,
-          end: this.pos,
-          value: ''
-        }
-      }
-
       switch (true) {
+        case this.char == '':
+          return {
+            type: TokenType.EOF,
+            start: this.pos,
+            end: this.pos,
+            value: ''
+          }
+
         case INVALIDS.has(this.char):
           continue
 
-        case alphabetic.test(this.char):
+        case specialChar.test(this.char):
           return this.lexIdent()
 
         case number.test(this.char) || (this.char === '.' && number.test(this.peek)):
