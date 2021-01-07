@@ -39,7 +39,7 @@ export class Lexer {
       }
 
       switch (true) {
-        case whitespace.test(this.char):
+        case INVALIDS.has(this.char):
           continue
 
         case alphabetic.test(this.char):
@@ -109,6 +109,7 @@ export class Lexer {
     }
 
     while (number.test(this.peek) || this.peek === '.') {
+      // Break on 'digit..another_digit'
       if (this.peek === '.' && result.value.includes('.')) {
         break
       }
