@@ -1,7 +1,6 @@
 import { Position } from './position'
 import { Token, TokenType } from './tokens'
 
-const whitespace = /\s/
 const alphabetic = /[a-zA-Z]/
 const number = /(\d|\.)/
 const specialChar = /[<>!@#$%/^&*+=_-]/
@@ -91,7 +90,7 @@ export class Lexer {
       value: this.char
     }
 
-    while (alphabetic.test(this.peek)) {
+    while (alphabetic.test(this.peek) || /\d/.test(this.peek)) {
       this.readChar()
       result.value += this.char
       result.end++
