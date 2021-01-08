@@ -264,4 +264,162 @@ describe('Lexer', () => {
         }
       ])
   })
+
+  it('one function call with one constant', () => {
+    const result = Lexer.lex('1 + log(PI)')
+
+    expect(result).toEqual([
+      {
+        start: 0,
+        end: 1,
+        type: TokenType.NUMBER,
+        value: '1'
+      },
+      {
+        start: 2,
+        end: 3,
+        type: TokenType.OPERATOR,
+        value: '+'
+      },
+      {
+        start: 4,
+        end: 7,
+        type: TokenType.IDENT,
+        value: 'log'
+      },
+      {
+        start: 7,
+        end: 8,
+        type: TokenType.LPAREN,
+        value: '('
+      },
+      {
+        start: 8,
+        end: 10,
+        type: TokenType.IDENT,
+        value: 'PI'
+      },
+      {
+        start: 10,
+        end: 11,
+        type: TokenType.RPAREN,
+        value: ')'
+      },
+      {
+        start: 12,
+        end: 12,
+        type: TokenType.EOF,
+        value: ''
+      }
+    ])
+  })
+
+  it('nested function call with multiple operation', () => {
+    const result = Lexer.lex('2 * log(cos(PI / -4) + 3) ^ 56')
+
+    expect(result).toEqual([
+      {
+        start: 0,
+        end: 1,
+        type: TokenType.NUMBER,
+        value: '2'
+      },
+      {
+        start: 2,
+        end: 3,
+        type: TokenType.OPERATOR,
+        value: '*'
+      },
+      {
+        start: 4,
+        end: 7,
+        type: TokenType.IDENT,
+        value: 'log'
+      },
+      {
+        start: 7,
+        end: 8,
+        type: TokenType.LPAREN,
+        value: '('
+      },
+      {
+        start: 8,
+        end: 11,
+        type: TokenType.IDENT,
+        value: 'cos'
+      },
+      {
+        start: 11,
+        end: 12,
+        type: TokenType.LPAREN,
+        value: '('
+      },
+      {
+        start: 12,
+        end: 14,
+        type: TokenType.IDENT,
+        value: 'PI'
+      },
+      {
+        start: 15,
+        end: 16,
+        type: TokenType.OPERATOR,
+        value: '/'
+      },
+      {
+        start: 17,
+        end: 18,
+        type: TokenType.OPERATOR,
+        value: '-'
+      },
+      {
+        start: 18,
+        end: 19,
+        type: TokenType.NUMBER,
+        value: '4'
+      },
+      {
+        start: 19,
+        end: 20,
+        type: TokenType.RPAREN,
+        value: ')'
+      },
+      {
+        start: 21,
+        end: 22,
+        type: TokenType.OPERATOR,
+        value: '+'
+      },
+      {
+        start: 23,
+        end: 24,
+        type: TokenType.NUMBER,
+        value: '3'
+      },
+      {
+        start: 24,
+        end: 25,
+        type: TokenType.RPAREN,
+        value: ')'
+      },
+      {
+        start: 26,
+        end: 27,
+        type: TokenType.OPERATOR,
+        value: '^'
+      },
+      {
+        start: 28,
+        end: 30,
+        type: TokenType.NUMBER,
+        value: '56'
+      },
+      {
+        start: 31,
+        end: 31,
+        type: TokenType.EOF,
+        value: ''
+      }
+    ])
+  })
 })
