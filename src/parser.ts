@@ -1,7 +1,7 @@
 /* eslint-disable no-case-declarations */
 import { Constant, CONSTANTS } from './constant'
 import { Token, TokenType } from './tokens'
-import { OPERATIONS, Operation, Operator, Parenthesis } from './operation'
+import { OPERATIONS, Operation, Operator, Parenthesis, Func } from './operation'
 import { Lexer } from './lexer'
 import { Position } from './position'
 
@@ -93,7 +93,7 @@ export class Parser {
 
           const func = OPERATIONS.get(token.value)
           if (func !== undefined) {
-            this.output.push(func)
+            this.operation.push(func)
             continue
           }
 
@@ -152,6 +152,11 @@ export class Parser {
       // the operator on the top of the operator stack is not a left parenthesis
       !(this.lastOperation instanceof Parenthesis && this.lastOperation.isLeft)) {
       this.output.push(this.operation.pop() as Operation)
+
+      // Break after function pop
+      if (this.lastOperation instanceof Func) {
+        break
+      }
     }
 
     if (this.lastOperation instanceof Parenthesis && this.lastOperation.isLeft) {
