@@ -3,6 +3,7 @@ import { Constant, CONSTANTS } from './constant'
 import { Token, TokenType } from './tokens'
 import { OPERATIONS, Operation, Operator, Parenthesis } from './operation'
 import { Lexer } from './lexer'
+import { Position } from './position'
 
 class InvalidTokenError extends Error {
   constructor (token: Token) {
@@ -27,73 +28,103 @@ class UnkownOperatorError extends Error {
 export class Parser {
   private readonly output: Array<Constant|number|Operation>
   private readonly operation: Operation[]
+  private readonly src: Token[]
+  private token: Token
+  private pos: Position
+
+  constructor (tokens: Token[]) {
+    this.output = []
+    this.operation = []
+    this.src = tokens
+    this.pos = 0
+  }
 
   get result (): Array<Constant|number|Operation> {
     return [...this.output]
   }
 
-  constructor () {
-    this.output = []
-    this.operation = []
+  private get nextToken (): Token {
+    return this.src[this.pos]
+  }
+
+  private get previousToken (): Token {
+    return this.readToken[this.pos - 1]
+  }
+
+  private readToken (): void {
+    this.token = this.src[this.pos]
+    this.pos++
   }
 
   static parse (expr: string): Array<Constant|number|Operation> {
     const tokens = Lexer.lex(expr)
-    const parser = new Parser()
-
-    while (tokens.length !== 0) {
-      parser.parse(tokens.pop() as Token)
-    }
+    const parser = new Parser(tokens)
+    parser.parse()
 
     return parser.result
   }
 
-  parse (token: Token): void {
-    switch (token.type) {
-      case TokenType.EOF:
-        while (this.operation.length !== 0) {
-          this.output.push(this.operation.pop() as Operation)
-        }
-        return
+  private parse (): void {
+    while (this.output.length !== this.src.length) {
+      this.readToken()
+      const token = this.token
 
-      case TokenType.ILLEGAL:
-        throw new InvalidTokenError(token)
-
-      case TokenType.NUMBER:
-        this.output.push(parseFloat(token.value))
-        break
-
-      case TokenType.IDENT:
-        const constant = CONSTANTS.get(token.value)
-        if (constant !== undefined) {
-          this.output.push(constant)
+      switch (token.type) {
+        case TokenType.EOF:
+          while (this.operation.length > 0) {
+            const op = this.operation.pop() as Operation
+            this.output.push(op)
+          }
           return
-        }
 
-        const func = OPERATIONS.get(token.value)
-        if (func !== undefined) {
-          this.output.push(func)
-          return
-        }
+        case TokenType.ILLEGAL:
+          throw new InvalidTokenError(token)
 
-        throw new UnkownIdentifierError(token)
+        case TokenType.NUMBER:
+          this.output.push(parseFloat(token.value))
+          break
 
-      case TokenType.LPAREN:
-        this.operation.push(OPERATIONS.get('(') as Parenthesis)
-        break
+        case TokenType.IDENT:
+          const constant = CONSTANTS.get(token.value)
+          if (constant !== undefined) {
+            this.output.push(constant)
+            continue
+          }
 
-      case TokenType.RPAREN:
-        this.parseRightParenthesis(OPERATIONS.get(')') as Parenthesis)
-        break
+          const func = OPERATIONS.get(token.value)
+          if (func !== undefined) {
+            this.output.push(func)
+            continue
+          }
 
-      case TokenType.OPERATOR:
-        const op = OPERATIONS.get(token.value)
-        if (op !== undefined && op instanceof Operator) {
-          this.parseOperator(op)
-          return
-        }
+          throw new UnkownIdentifierError(token)
 
-        throw new UnkownOperatorError(token)
+        case TokenType.LPAREN:
+          this.operation.push(OPERATIONS.get('(') as Parenthesis)
+          break
+
+        case TokenType.RPAREN:
+          this.parseRightParenthesis(OPERATIONS.get(')') as Parenthesis)
+          break
+
+        case TokenType.OPERATOR:
+          // Negative number
+          if (token.value === '-' && this.nextToken.type === TokenType.NUMBER &&
+          (this.previousToken === undefined || this.previousToken.type === TokenType.OPERATOR)) {
+            this.output.push(parseFloat(this.nextToken.value) * -1)
+            this.readToken()
+
+            continue
+          }
+
+          const op = OPERATIONS.get(token.value)
+          if (op !== undefined && op instanceof Operator) {
+            this.parseOperator(op)
+            continue
+          }
+
+          throw new UnkownOperatorError(token)
+      }
     }
   }
 
@@ -118,7 +149,7 @@ export class Parser {
 
   private parseRightParenthesis (rp: Parenthesis): void {
     while (this.operation.length !== 0 &&
-      // the operator at the top of the operator stack is not a left parenthesis
+      // the operator on the top of the operator stack is not a left parenthesis
       !(this.lastOperation instanceof Parenthesis && this.lastOperation.isLeft)) {
       this.output.push(this.operation.pop() as Operation)
     }

@@ -67,7 +67,7 @@ export class Operator extends Operation {
 }
 
 OPERATIONS.set('+', new Operator(1, (a: number, b: number) => a + b))
-OPERATIONS.set('-', new Operator(1, (a: number, b: number) => a - b))
+OPERATIONS.set('-', new Operator(1, (b: number, a = 0) => a - b))
 OPERATIONS.set('/', new Operator(10, (a: number, b: number) => a / b))
 OPERATIONS.set('*', new Operator(10, (a: number, b: number) => a * b))
 OPERATIONS.set('^', new Operator(100, (a: number, b: number) => a ** b, false))
