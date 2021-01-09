@@ -20,7 +20,10 @@ export class Func extends Operation {
 }
 
 // Basic functions
-OPERATIONS.set('log', new Func((...args: number[]) => Math.log10(args[0])))
+OPERATIONS.set('log2', new Func((...args: number[]) => Math.log2(args[0])))
+OPERATIONS.set('log', new Func((...args: number[]) => Math.log(args[0])))
+
+OPERATIONS.set('log10', new Func((...args: number[]) => Math.log(args[0])))
 OPERATIONS.set('pow10', new Func((...args: number[]) => 10 ** args[0]))
 
 OPERATIONS.set('ln', new Func((...args: number[]) => Math.log(args[0])))
