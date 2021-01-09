@@ -45,4 +45,36 @@ describe('Parser', () => {
       OPERATIONS.get('+')
     ])
   })
+
+  it('simple function call', () => {
+    const result = Parser.parse('log2(8)')
+
+    expect(result).toEqual([8, OPERATIONS.get('log2')])
+  })
+
+  it('simple function call with operation as argument', () => {
+    const result = Parser.parse('log2(8 * 3)')
+
+    expect(result).toEqual([8, 3, OPERATIONS.get('*'), OPERATIONS.get('log2')])
+  })
+
+  it('simple function call with operation with parenthesis as argument', () => {
+    const result = Parser.parse('log2((8 + 3) * 4)')
+
+    expect(result).toEqual([8, 3, OPERATIONS.get('+'), 4, OPERATIONS.get('*'), OPERATIONS.get('log2')])
+  })
+
+  it('nested function call', () => {
+    const result = Parser.parse('log2((8 + 3) * sqrt(4))')
+
+    expect(result).toEqual([8, 3, OPERATIONS.get('+'), 4, OPERATIONS.get('sqrt'), OPERATIONS.get('*'), OPERATIONS.get('log2')])
+  })
+
+  it('multiple function call', () => {
+    const result = Parser.parse('log2(8 + 3) * sqrt(4)')
+
+    console.log(result)
+
+    expect(result).toEqual([8, 3, OPERATIONS.get('+'), OPERATIONS.get('log2'), 4, OPERATIONS.get('sqrt'), OPERATIONS.get('*')])
+  })
 })
