@@ -10,14 +10,22 @@ export class Lexer {
   private pos: Position
   private readonly src: string
   private char: string
+  result: Token[]
 
   constructor (src: string) {
     this.pos = 0
     this.src = src
   }
 
-  private get peek (): string {
-    return this.src.charAt(this.pos)
+  private get nextChar (): string {
+    let i = this.pos
+    let c
+    do {
+      c = this.src.charAt(i)
+      i++
+    } while (INVALIDS.has(c))
+
+    return c
   }
 
   private readChar (): void {
@@ -57,7 +65,8 @@ export class Lexer {
         case alphabetic.test(this.char):
           return this.lexIdent()
 
-        case number.test(this.char) || (this.char === '.' && number.test(this.peek)):
+        case number.test(this.char) ||
+            (this.char === '.' && number.test(this.nextChar)):
           return this.lexNumber()
 
         case this.char === '(':
@@ -103,7 +112,7 @@ export class Lexer {
       value: this.char
     }
 
-    while (alphabetic.test(this.peek) || /\d/.test(this.peek)) {
+    while (alphabetic.test(this.nextChar) || /\d/.test(this.nextChar)) {
       this.readChar()
       result.value += this.char
     }
@@ -120,9 +129,9 @@ export class Lexer {
       value: this.char
     }
 
-    while (number.test(this.peek) || this.peek === '.') {
+    while (number.test(this.nextChar) || this.nextChar === '.') {
       // Break on 'digit..another_digit'
-      if (this.peek === '.' && result.value.includes('.')) {
+      if (this.nextChar === '.' && result.value.includes('.')) {
         break
       }
 
