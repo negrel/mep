@@ -10,6 +10,7 @@
     "lint:fix": "npm run lint -- --fix",
     "build": "rollup --config",
     "test": "jest",
+    "test:watch": "jest --watch",
     "coverage": "jest --coverage"
   },
   "keywords": [],
