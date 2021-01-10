@@ -1,4 +1,11 @@
-[![js-standard-style](https://cdn.rawgit.com/standard/standard/master/badge.svg)](http://standardjs.com)
+<div>
+	<a src="https://standardjs.com">
+		<img src="https://cdn.rawgit.com/standard/standard/master/badge.svg" alt="standardjs badge">
+	</a>
+	<a href="https://github.com/negrel/ringo/raw/master/LICENSE">
+		<img src="https://img.shields.io/badge/license-MIT-green">
+	</a>
+</div>
 
 # :heavy_division_sign: - MEP is a mathematical expression parser written in JavaScript
 
@@ -20,8 +27,12 @@ $ npm install mep
 
 You can now import `mep` as an ES modules or a CommonJS module.
 
+## Exemple
+
 ```js
-const { compute, registerConstant } = require('./dist/bundle.cjs')
+import { compute, registerConstant } from 'mep' 
+// or
+// const { compute, registerConstant } = require('mep')
 
 console.log('Result:', compute('log2(5 * 65 + cos(PI ^ 2))'))
 // Result: 8.340283256791498
