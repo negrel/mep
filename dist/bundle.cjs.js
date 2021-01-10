@@ -14,7 +14,9 @@ class Func extends Operation {
         return this.fn(...args);
     }
 }
-OPERATIONS.set('log', new Func((...args) => Math.log10(args[0])));
+OPERATIONS.set('log2', new Func((...args) => Math.log2(args[0])));
+OPERATIONS.set('log', new Func((...args) => Math.log(args[0])));
+OPERATIONS.set('log10', new Func((...args) => Math.log(args[0])));
 OPERATIONS.set('pow10', new Func((...args) => 10 ** args[0]));
 OPERATIONS.set('ln', new Func((...args) => Math.log(args[0])));
 OPERATIONS.set('exp', new Func((...args) => Math.exp(args[0])));
@@ -44,7 +46,7 @@ class Operator extends Operation {
     }
 }
 OPERATIONS.set('+', new Operator(1, (a, b) => a + b));
-OPERATIONS.set('-', new Operator(1, (a, b) => a - b));
+OPERATIONS.set('-', new Operator(1, (b, a = 0) => a - b));
 OPERATIONS.set('/', new Operator(10, (a, b) => a / b));
 OPERATIONS.set('*', new Operator(10, (a, b) => a * b));
 OPERATIONS.set('^', new Operator(100, (a, b) => a ** b, false));
@@ -92,8 +94,14 @@ class Lexer {
         this.pos = 0;
         this.src = src;
     }
-    get peek() {
-        return this.src.charAt(this.pos);
+    get nextChar() {
+        let i = this.pos;
+        let c;
+        do {
+            c = this.src.charAt(i);
+            i++;
+        } while (INVALIDS.has(c));
+        return c;
     }
     readChar() {
         this.char = this.src.charAt(this.pos);
@@ -124,7 +132,8 @@ class Lexer {
                     continue;
                 case alphabetic.test(this.char):
                     return this.lexIdent();
-                case number.test(this.char) || (this.char === '.' && number.test(this.peek)):
+                case number.test(this.char) ||
+                    (this.char === '.' && number.test(this.nextChar)):
                     return this.lexNumber();
                 case this.char === '(':
                     return {
@@ -164,7 +173,7 @@ class Lexer {
             end: 0,
             value: this.char
         };
-        while (alphabetic.test(this.peek) || /\d/.test(this.peek)) {
+        while (alphabetic.test(this.nextChar) || /\d/.test(this.nextChar)) {
             this.readChar();
             result.value += this.char;
         }
@@ -178,8 +187,8 @@ class Lexer {
             end: 0,
             value: this.char
         };
-        while (number.test(this.peek) || this.peek === '.') {
-            if (this.peek === '.' && result.value.includes('.')) {
+        while (number.test(this.nextChar) || this.nextChar === '.') {
+            if (this.nextChar === '.' && result.value.includes('.')) {
                 break;
             }
             this.readChar();
@@ -206,61 +215,79 @@ class UnkownOperatorError extends Error {
     }
 }
 class Parser {
-    constructor() {
+    constructor(tokens) {
         this.output = [];
         this.operation = [];
+        this.src = tokens;
+        this.pos = 0;
+        this.parse();
     }
     get result() {
         return [...this.output];
     }
+    get nextToken() {
+        return this.src[this.pos];
+    }
+    get previousToken() {
+        return this.readToken[this.pos - 1];
+    }
+    readToken() {
+        this.token = this.src[this.pos];
+        this.pos++;
+    }
     static parse(expr) {
         const tokens = Lexer.lex(expr);
-        const parser = new Parser();
-        console.log(tokens);
-        while (tokens.length > 0) {
-            parser.parse(tokens.pop());
-        }
-        console.log(parser.result);
+        const parser = new Parser(tokens);
         return parser.result;
     }
-    parse(token) {
-        console.log('TOKEN', token, this);
-        switch (token.type) {
-            case exports.TokenType.EOF:
-                while (this.operation.length > 0) {
-                    this.output.push(this.operation.pop());
-                }
-                return;
-            case exports.TokenType.ILLEGAL:
-                throw new InvalidTokenError(token);
-            case exports.TokenType.NUMBER:
-                this.output.push(parseFloat(token.value));
-                break;
-            case exports.TokenType.IDENT:
-                const constant = CONSTANTS.get(token.value);
-                if (constant !== undefined) {
-                    this.output.push(constant);
+    parse() {
+        while (this.output.length !== this.src.length) {
+            this.readToken();
+            const token = this.token;
+            switch (token.type) {
+                case exports.TokenType.EOF:
+                    while (this.operation.length > 0) {
+                        const op = this.operation.pop();
+                        this.output.push(op);
+                    }
                     return;
-                }
-                const func = OPERATIONS.get(token.value);
-                if (func !== undefined) {
-                    this.output.push(func);
-                    return;
-                }
-                throw new UnkownIdentifierError(token);
-            case exports.TokenType.LPAREN:
-                this.operation.push(OPERATIONS.get('('));
-                break;
-            case exports.TokenType.RPAREN:
-                this.parseRightParenthesis(OPERATIONS.get(')'));
-                break;
-            case exports.TokenType.OPERATOR:
-                const op = OPERATIONS.get(token.value);
-                if (op !== undefined && op instanceof Operator) {
-                    this.parseOperator(op);
-                    return;
-                }
-                throw new UnkownOperatorError(token);
+                case exports.TokenType.ILLEGAL:
+                    throw new InvalidTokenError(token);
+                case exports.TokenType.NUMBER:
+                    this.output.push(parseFloat(token.value));
+                    break;
+                case exports.TokenType.IDENT:
+                    const constant = CONSTANTS.get(token.value);
+                    if (constant !== undefined) {
+                        this.output.push(constant);
+                        continue;
+                    }
+                    const func = OPERATIONS.get(token.value);
+                    if (func !== undefined) {
+                        this.operation.push(func);
+                        continue;
+                    }
+                    throw new UnkownIdentifierError(token);
+                case exports.TokenType.LPAREN:
+                    this.operation.push(OPERATIONS.get('('));
+                    break;
+                case exports.TokenType.RPAREN:
+                    this.parseRightParenthesis(OPERATIONS.get(')'));
+                    break;
+                case exports.TokenType.OPERATOR:
+                    if (token.value === '-' && this.nextToken.type === exports.TokenType.NUMBER &&
+                        (this.previousToken === undefined || this.previousToken.type === exports.TokenType.OPERATOR)) {
+                        this.output.push(parseFloat(this.nextToken.value) * -1);
+                        this.readToken();
+                        continue;
+                    }
+                    const op = OPERATIONS.get(token.value);
+                    if (op !== undefined && op instanceof Operator) {
+                        this.parseOperator(op);
+                        continue;
+                    }
+                    throw new UnkownOperatorError(token);
+            }
         }
     }
     get lastOperation() {
@@ -279,6 +306,9 @@ class Parser {
         }
         if (this.lastOperation instanceof Parenthesis && this.lastOperation.isLeft) {
             this.operation.pop();
+        }
+        if (this.lastOperation instanceof Func) {
+            this.output.push(this.operation.pop());
         }
     }
 }

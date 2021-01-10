@@ -2,10 +2,10 @@
   "name": "mep",
   "version": "1.0.0",
   "description": "MEP is a mathematical expression parser for JavaScript",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/bundle.cjs.js",
+  "module": "dist/bundle.es.js",
   "scripts": {
-    "start": "snowpack dev",
+    "prepublish": "npm run build && npm run coverage",
     "lint": "eslint src tests",
     "lint:fix": "npm run lint -- --fix",
     "build": "rollup --config",
