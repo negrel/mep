@@ -1,11 +1,10 @@
 import { INVALIDS } from './invalid'
+import { FuncRegex } from './func'
+import { OperatorRegex } from './operator'
 import { Position } from './position'
 import { Token, TokenType } from './tokens'
 
-const alphabetic = /[a-zA-Z]/
 const number = /(\d|\.)/
-const specialChar = /[^A-Za-z0-9\s]/
-
 export class Lexer {
   private pos: Position
   private readonly src: string
@@ -62,7 +61,7 @@ export class Lexer {
         case INVALIDS.has(this.char):
           continue
 
-        case alphabetic.test(this.char):
+        case FuncRegex.test(this.char):
           return this.lexIdent()
 
         case number.test(this.char) ||
@@ -85,7 +84,7 @@ export class Lexer {
             value: this.char
           }
 
-        case specialChar.test(this.char):
+        case OperatorRegex.test(this.char):
           return {
             type: TokenType.OPERATOR,
             start: this.pos - 1,
@@ -112,7 +111,7 @@ export class Lexer {
       value: this.char
     }
 
-    while (alphabetic.test(this.nextChar) || /\d/.test(this.nextChar)) {
+    while (FuncRegex.test(this.nextChar) || /\d/.test(this.nextChar)) {
       this.readChar()
       result.value += this.char
     }

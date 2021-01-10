@@ -1,7 +1,9 @@
 /* eslint-disable no-case-declarations */
 import { Constant, CONSTANTS } from './constant'
 import { Token, TokenType } from './tokens'
-import { OPERATIONS, Operation, Operator, Parenthesis, Func } from './operation'
+import { Operator } from './operator'
+import { Func } from './func'
+import { OPERATIONS, Operation, Parenthesis } from './operation'
 import { Lexer } from './lexer'
 import { Position } from './position'
 
