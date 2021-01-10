@@ -1,51 +1,6 @@
 const OPERATIONS = new Map();
 class Operation {
 }
-class Func extends Operation {
-    constructor(fn) {
-        super();
-        this.fn = fn;
-    }
-    do(...args) {
-        return this.fn(...args);
-    }
-}
-OPERATIONS.set('log2', new Func((...args) => Math.log2(args[0])));
-OPERATIONS.set('log', new Func((...args) => Math.log(args[0])));
-OPERATIONS.set('log10', new Func((...args) => Math.log(args[0])));
-OPERATIONS.set('pow10', new Func((...args) => 10 ** args[0]));
-OPERATIONS.set('ln', new Func((...args) => Math.log(args[0])));
-OPERATIONS.set('exp', new Func((...args) => Math.exp(args[0])));
-OPERATIONS.set('sin', new Func((...args) => Math.sin(args[0])));
-OPERATIONS.set('arcsin', new Func((...args) => Math.asin(args[0])));
-OPERATIONS.set('cos', new Func((...args) => Math.cos(args[0])));
-OPERATIONS.set('arccos', new Func((...args) => Math.acos(args[0])));
-OPERATIONS.set('tan', new Func((...args) => Math.tan(args[0])));
-OPERATIONS.set('arctan', new Func((...args) => Math.atan(args[0])));
-OPERATIONS.set('pow2', new Func((...args) => args[0] ** 2));
-OPERATIONS.set('sqrt', new Func((...args) => Math.sqrt(args[0])));
-function factorial(a) {
-    return a <= 0 ? 1 : a * factorial(a - 1);
-}
-OPERATIONS.set('fac', new Func((...args) => factorial(args[0])));
-OPERATIONS.set('max', new Func((...args) => Math.max(...args)));
-OPERATIONS.set('min', new Func((...args) => Math.min(...args)));
-class Operator extends Operation {
-    constructor(precedence, op, leftAssociative = true) {
-        super();
-        this.precedence = precedence;
-        this.op = op;
-        this.isLeftAssociative = leftAssociative;
-    }
-    do(...args) {
-        return this.op(args[0], args[1]);
-    }
-}
-OPERATIONS.set('+', new Operator(1, (a, b) => a + b));
-OPERATIONS.set('-', new Operator(1, (b, a = 0) => a - b));
-OPERATIONS.set('/', new Operator(10, (a, b) => a / b));
-OPERATIONS.set('*', new Operator(10, (a, b) => a * b));
-OPERATIONS.set('^', new Operator(100, (a, b) => a ** b, false));
 class InvalidOperationCallError extends Error {
     constructor(operation) {
         super(`operation "${operation}" is not valid`);
@@ -63,9 +18,96 @@ class Parenthesis extends Operation {
 OPERATIONS.set('(', new Parenthesis(true));
 OPERATIONS.set(')', new Parenthesis(false));
 
+class Operator extends Operation {
+    constructor(precedence, op, leftAssociative = true) {
+        super();
+        this.precedence = precedence;
+        this.op = op;
+        this.isLeftAssociative = leftAssociative;
+    }
+    do(...args) {
+        return this.op(args[0], args[1]);
+    }
+}
+const OperatorRegex = /[^A-Za-z0-9\s]/;
+class InvalidOperatorError extends Error {
+    constructor(opSign, err) {
+        super(`"${opSign}" is not a valid operator: ${err}"`);
+    }
+}
+const registerOperator = (char, precedence, fn, leftAssociative = true) => {
+    if (char.length !== 1) {
+        throw new InvalidOperatorError(char, 'must be 1 char long');
+    }
+    if (!OperatorRegex.test(char)) {
+        throw new InvalidOperatorError(char, `must match ${String(OperatorRegex)}`);
+    }
+    OPERATIONS.set(char, new Operator(precedence, fn));
+};
+registerOperator('+', 1, (a, b) => a + b);
+registerOperator('-', 1, (b, a = 0) => a - b);
+registerOperator('/', 10, (a, b) => a / b);
+registerOperator('*', 10, (a, b) => a * b);
+registerOperator('^', 100, (a, b) => a ** b, false);
+
 const CONSTANTS = new Map();
+const IdentifierRegex = /[a-zA-Z]/;
+const ConstantRegex = IdentifierRegex;
+class InvalidConstantNameError extends Error {
+    constructor(constName, err) {
+        super(`"${constName}" is not a valid constant name: ${err}"`);
+    }
+}
+const registerConstant = (name, value) => {
+    if (!ConstantRegex.test(name.charAt(0))) {
+        throw new InvalidConstantNameError(name, 'must start with an alphabetic character');
+    }
+    CONSTANTS.set(name, value);
+};
 CONSTANTS.set('PI', Math.PI);
 CONSTANTS.set('e', Math.E);
+
+const FuncRegex = IdentifierRegex;
+class Func extends Operation {
+    constructor(fn) {
+        super();
+        this.fn = fn;
+    }
+    do(...args) {
+        return this.fn(...args);
+    }
+}
+class InvalidFuncNameError extends Error {
+    constructor(funcName, err) {
+        super(`"${funcName}" is not a valid function name: ${err}"`);
+    }
+}
+const registerFunc = (name, fn) => {
+    if (!FuncRegex.test(name.charAt(0))) {
+        throw new InvalidFuncNameError(name, 'must start with an alphabetic character');
+    }
+    OPERATIONS.set(name, new Func(fn));
+};
+registerFunc('log2', (...args) => Math.log2(args[0]));
+registerFunc('log', (...args) => Math.log(args[0]));
+registerFunc('log10', (...args) => Math.log(args[0]));
+registerFunc('pow10', (...args) => 10 ** args[0]);
+registerFunc('ln', (...args) => Math.log(args[0]));
+registerFunc('exp', (...args) => Math.exp(args[0]));
+registerFunc('sin', (...args) => Math.sin(args[0]));
+registerFunc('arcsin', (...args) => Math.asin(args[0]));
+registerFunc('cos', (...args) => Math.cos(args[0]));
+registerFunc('arccos', (...args) => Math.acos(args[0]));
+registerFunc('tan', (...args) => Math.tan(args[0]));
+registerFunc('arctan', (...args) => Math.atan(args[0]));
+registerFunc('pow2', (...args) => args[0] ** 2);
+registerFunc('sqrt', (...args) => Math.sqrt(args[0]));
+function factorial(a) {
+    return a <= 0 ? 1 : a * factorial(a - 1);
+}
+registerFunc('fac', (...args) => factorial(args[0]));
+registerFunc('max', (...args) => Math.max(...args));
+registerFunc('min', (...args) => Math.min(...args));
 
 var TokenType;
 (function (TokenType) {
@@ -83,9 +125,7 @@ INVALIDS.add(' ');
 INVALIDS.add('\n');
 INVALIDS.add('\t');
 
-const alphabetic = /[a-zA-Z]/;
 const number = /(\d|\.)/;
-const specialChar = /[^A-Za-z0-9\s]/;
 class Lexer {
     constructor(src) {
         this.pos = 0;
@@ -127,7 +167,7 @@ class Lexer {
                     };
                 case INVALIDS.has(this.char):
                     continue;
-                case alphabetic.test(this.char):
+                case FuncRegex.test(this.char):
                     return this.lexIdent();
                 case number.test(this.char) ||
                     (this.char === '.' && number.test(this.nextChar)):
@@ -146,7 +186,7 @@ class Lexer {
                         end: this.pos,
                         value: this.char
                     };
-                case specialChar.test(this.char):
+                case OperatorRegex.test(this.char):
                     return {
                         type: TokenType.OPERATOR,
                         start: this.pos - 1,
@@ -170,7 +210,7 @@ class Lexer {
             end: 0,
             value: this.char
         };
-        while (alphabetic.test(this.nextChar) || /\d/.test(this.nextChar)) {
+        while (FuncRegex.test(this.nextChar) || /\d/.test(this.nextChar)) {
             this.readChar();
             result.value += this.char;
         }
@@ -328,6 +368,9 @@ function computeRPN(rpn) {
     else if (typeof op === 'number' || op.constructor.name === 'Number') {
         return op;
     }
+    else if (op instanceof Func) {
+        return op.do(computeRPN(rpn));
+    }
     else {
         throw new UnsupportedTypeForComputeError(JSON.stringify(op), op.constructor.name);
     }
@@ -337,5 +380,4 @@ function compute(calcul) {
     return computeRPN(rpn);
 }
 
-export default compute;
-export { Lexer, Parser, TokenType, UnsupportedTypeForComputeError };
+export { Lexer, Parser, TokenType, compute, registerConstant, registerFunc, registerOperator };
