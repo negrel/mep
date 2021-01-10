@@ -1,6 +1,6 @@
 {
   "name": "mep",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MEP is a mathematical expression parser for JavaScript",
   "main": "dist/bundle.cjs.js",
   "module": "dist/bundle.es.js",
