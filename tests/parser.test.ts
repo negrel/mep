@@ -73,8 +73,6 @@ describe('Parser', () => {
   it('multiple function call', () => {
     const result = Parser.parse('log2(8 + 3) * sqrt(4)')
 
-    console.log(result)
-
     expect(result).toEqual([8, 3, OPERATIONS.get('+'), OPERATIONS.get('log2'), 4, OPERATIONS.get('sqrt'), OPERATIONS.get('*')])
   })
 })

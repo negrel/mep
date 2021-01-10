@@ -37,6 +37,7 @@ export class Parser {
     this.operation = []
     this.src = tokens
     this.pos = 0
+    this.parse()
   }
 
   get result (): Array<Constant|number|Operation> {
@@ -59,7 +60,6 @@ export class Parser {
   static parse (expr: string): Array<Constant|number|Operation> {
     const tokens = Lexer.lex(expr)
     const parser = new Parser(tokens)
-    parser.parse()
 
     return parser.result
   }
@@ -152,15 +152,16 @@ export class Parser {
       // the operator on the top of the operator stack is not a left parenthesis
       !(this.lastOperation instanceof Parenthesis && this.lastOperation.isLeft)) {
       this.output.push(this.operation.pop() as Operation)
-
-      // Break after function pop
-      if (this.lastOperation instanceof Func) {
-        break
-      }
     }
 
+    // Remove the left parenthesis
     if (this.lastOperation instanceof Parenthesis && this.lastOperation.isLeft) {
       this.operation.pop()
+    }
+
+    // Remove the function
+    if (this.lastOperation instanceof Func) {
+      this.output.push(this.operation.pop() as Func)
     }
   }
 }
