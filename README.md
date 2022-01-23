@@ -11,14 +11,15 @@
 
 ## Why ?
 
-I needed an **extensible** mathematical expression parser for on of my project:  [1Calc]() ([source code](https://github.com/OG-Suite/1calc))
+I needed an **extensible** mathematical expression parser for [1Calc](https://github.com/OG-Suite/1calc)
 
-Thus, this package needed to fit my needs which are the following:
+This package does the following:
 - Lex mathematical expressions with **custom** operations, constants and functions into tokens
 - Parse tokens and return an [RPN](https://en.wikipedia.org/wiki/Reverse_Polish_notation) array of `numbers` / `Operation`.
 - Compute an [RPN](https://en.wikipedia.org/wiki/Reverse_Polish_notation) array and return the result
 
 ## Installation
+
 Using npm:
 
 ```shell
