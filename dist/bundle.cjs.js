@@ -113,6 +113,7 @@ registerFunc('fac', (...args) => factorial(args[0]));
 registerFunc('max', (...args) => Math.max(...args));
 registerFunc('min', (...args) => Math.min(...args));
 
+exports.TokenType = void 0;
 (function (TokenType) {
     TokenType[TokenType["EOF"] = 0] = "EOF";
     TokenType[TokenType["ILLEGAL"] = 1] = "ILLEGAL";
