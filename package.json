@@ -5,6 +5,9 @@
   "main": "dist/bundle.cjs.js",
   "module": "dist/bundle.es.js",
   "types": "dist/types.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "prepublish": "npm run build && npm run coverage",
     "lint": "eslint src tests",
@@ -17,6 +20,7 @@
   "keywords": [],
   "author": "Alexandre Negrel",
   "license": "MIT",
+  "repository": "github:negrel/mep",
   "devDependencies": {
     "@rbnlffl/rollup-plugin-eslint": "^1.1.4",
     "@rollup/plugin-typescript": "^8.1.0",
