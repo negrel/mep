@@ -1,4 +1,4 @@
-import eslint from '@rbnlffl/rollup-plugin-eslint'
+import eslint from '@rollup/plugin-eslint'
 import typescript from '@rollup/plugin-typescript'
 import dts from 'rollup-plugin-dts'
 
@@ -25,7 +25,7 @@ export default [
   {
     input: 'src/index.ts',
     output: {
-      file: 'dist/types.d.ts',
+      file: 'dist/mep.d.ts',
       format: 'es'
     },
     watch,
