@@ -8,10 +8,22 @@ describe('Parser', () => {
     expect(result).toEqual([1, 1, OPERATIONS.get('+')])
   })
 
+  it('one substraction', () => {
+    const result = Parser.parse('3 - 25')
+
+    expect(result).toEqual([3, 25, OPERATIONS.get('-')])
+  })
+
   it('operation with negative number', () => {
     const result = Parser.parse('5 * -9')
 
     expect(result).toEqual([5, -9, OPERATIONS.get('*')])
+  })
+
+  it('substraction with negative number', () => {
+    const result = Parser.parse('5 - -9')
+
+    expect(result).toEqual([5, -9, OPERATIONS.get('-')])
   })
 
   it('multiple operation with parenthesis', () => {

@@ -45,6 +45,38 @@ describe('Lexer', () => {
       ])
   })
 
+  it('one substraction', () => {
+    const result = Lexer.lex('1 - 25')
+
+    expect(result)
+      .toEqual([
+        {
+          type: TokenType.NUMBER,
+          start: 0,
+          end: 1,
+          value: '1'
+        },
+        {
+          type: TokenType.OPERATOR,
+          start: 2,
+          end: 3,
+          value: '-'
+        },
+        {
+          type: TokenType.NUMBER,
+          start: 4,
+          end: 6,
+          value: '25'
+        },
+        {
+          type: TokenType.EOF,
+          start: 7,
+          end: 7,
+          value: ''
+        }
+      ])
+  })
+
   it('muliple operation with no space', () => {
     const result = Lexer.lex('9*7+10')
 

@@ -51,7 +51,7 @@ export class Parser {
   }
 
   private get previousToken (): Token {
-    return this.readToken[this.pos - 1]
+    return this.src[this.pos - 2]
   }
 
   private readToken (): void {
