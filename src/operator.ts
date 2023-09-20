@@ -38,7 +38,7 @@ export const registerOperator = (char: string, precedence: number, fn: (a: numbe
 }
 
 registerOperator('+', 1, (a: number, b: number) => a + b)
-registerOperator('-', 1, (b: number, a = 0) => a - b)
+registerOperator('-', 1, (b: number, a = 0) => b - a)
 registerOperator('/', 10, (a: number, b: number) => a / b)
 registerOperator('*', 10, (a: number, b: number) => a * b)
 registerOperator('^', 100, (a: number, b: number) => a ** b, false)
