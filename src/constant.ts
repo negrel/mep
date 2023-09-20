@@ -20,4 +20,5 @@ export const registerConstant = (name: string, value: number): void => {
 }
 
 CONSTANTS.set('PI', Math.PI)
+CONSTANTS.set('E', Math.E)
 CONSTANTS.set('e', Math.E)
