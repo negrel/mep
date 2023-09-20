@@ -7,7 +7,7 @@
 	</a>
 </div>
 
-# :heavy_division_sign: - MEP is a mathematical expression parser written in JavaScript
+# :heavy_division_sign: - MEP is a dependency free mathematical expression parser written in TypeScript.
 
 ## Why ?
 
@@ -31,7 +31,7 @@ You can now import `mep` as an ES modules or a CommonJS module.
 ## Exemple
 
 ```js
-import { compute, registerConstant } from 'mep' 
+import { compute, registerConstant } from 'mep'
 // or
 // const { compute, registerConstant } = require('mep')
 
@@ -50,6 +50,8 @@ or make a [pull request](https://github.com/negrel/MEP/pulls).
 
 ## :stars: Show your support
 Please give a :star: if this project helped you!
+
+[![buy me a coffee](.github/images/bmc-button.png)](https://www.buymeacoffee.com/negrel)
 
 #### :scroll: License
 MIT © [Alexandre Negrel](https://www.negrel.dev)
