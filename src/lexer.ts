@@ -1,144 +1,144 @@
-import { INVALIDS } from './invalid'
-import { FuncRegex } from './func'
-import { OperatorRegex } from './operator'
-import { Position } from './position'
-import { Token, TokenType } from './tokens'
+import { INVALIDS } from "./invalid.ts";
+import { FuncRegex } from "./func.ts";
+import { OperatorRegex } from "./operator.ts";
+import { Position } from "./position.ts";
+import { Token, TokenType } from "./tokens.ts";
 
-const number = /(\d|\.)/
+const number = /(\d|\.)/;
 export class Lexer {
-  private pos: Position
-  private readonly src: string
-  private char: string
-  result: Token[]
+  private pos: Position;
+  private readonly src: string;
+  private char = "";
+  result: Token[] = [];
 
-  constructor (src: string) {
-    this.pos = 0
-    this.src = src
+  constructor(src: string) {
+    this.pos = 0;
+    this.src = src;
   }
 
-  private get nextChar (): string {
-    let i = this.pos
-    let c
+  private get nextChar(): string {
+    let i = this.pos;
+    let c;
     do {
-      c = this.src.charAt(i)
-      i++
-    } while (INVALIDS.has(c))
+      c = this.src.charAt(i);
+      i++;
+    } while (INVALIDS.has(c));
 
-    return c
+    return c;
   }
 
-  private readChar (): void {
-    this.char = this.src.charAt(this.pos)
-    this.pos++
+  private readChar(): void {
+    this.char = this.src.charAt(this.pos);
+    this.pos++;
   }
 
-  static lex (src: string): Token[] {
-    const lexer = new Lexer(src)
-    const tokens: Token[] = []
+  static lex(src: string): Token[] {
+    const lexer = new Lexer(src);
+    const tokens: Token[] = [];
 
-    let token
+    let token;
     do {
-      token = lexer.lex()
-      tokens.push(token)
-    } while (token.type !== TokenType.EOF)
+      token = lexer.lex();
+      tokens.push(token);
+    } while (token.type !== TokenType.EOF);
 
-    return tokens
+    return tokens;
   }
 
-  lex (): Token {
+  lex(): Token {
     while (true) {
-      this.readChar()
+      this.readChar();
 
       switch (true) {
-        case this.char === '':
+        case this.char === "":
           return {
             type: TokenType.EOF,
             start: this.pos,
             end: this.pos,
-            value: ''
-          }
+            value: "",
+          };
 
         case INVALIDS.has(this.char):
-          continue
+          continue;
 
         case FuncRegex.test(this.char):
-          return this.lexIdent()
+          return this.lexIdent();
 
         case number.test(this.char) ||
-            (this.char === '.' && number.test(this.nextChar)):
-          return this.lexNumber()
+          (this.char === "." && number.test(this.nextChar)):
+          return this.lexNumber();
 
-        case this.char === '(':
+        case this.char === "(":
           return {
             type: TokenType.LPAREN,
             start: this.pos - 1,
             end: this.pos,
-            value: this.char
-          }
+            value: this.char,
+          };
 
-        case this.char === ')':
+        case this.char === ")":
           return {
             type: TokenType.RPAREN,
             start: this.pos - 1,
             end: this.pos,
-            value: this.char
-          }
+            value: this.char,
+          };
 
         case OperatorRegex.test(this.char):
           return {
             type: TokenType.OPERATOR,
             start: this.pos - 1,
             end: this.pos,
-            value: this.char
-          }
+            value: this.char,
+          };
 
         default:
           return {
             type: TokenType.ILLEGAL,
             start: this.pos,
             end: this.pos,
-            value: this.char
-          }
+            value: this.char,
+          };
       }
     }
   }
 
-  private lexIdent (): Token {
+  private lexIdent(): Token {
     const result: Token = {
       type: TokenType.IDENT,
       start: this.pos - 1,
       end: 0,
-      value: this.char
-    }
+      value: this.char,
+    };
 
     while (FuncRegex.test(this.nextChar) || /\d/.test(this.nextChar)) {
-      this.readChar()
-      result.value += this.char
+      this.readChar();
+      result.value += this.char;
     }
-    result.end = this.pos
+    result.end = this.pos;
 
-    return result
+    return result;
   }
 
-  private lexNumber (): Token {
+  private lexNumber(): Token {
     const result: Token = {
       type: TokenType.NUMBER,
       start: this.pos - 1,
       end: 0,
-      value: this.char
-    }
+      value: this.char,
+    };
 
-    while (number.test(this.nextChar) || this.nextChar === '.') {
+    while (number.test(this.nextChar) || this.nextChar === ".") {
       // Break on 'digit..another_digit'
-      if (this.nextChar === '.' && result.value.includes('.')) {
-        break
+      if (this.nextChar === "." && result.value.includes(".")) {
+        break;
       }
 
-      this.readChar()
-      result.value += this.char
+      this.readChar();
+      result.value += this.char;
     }
-    result.end = this.pos
+    result.end = this.pos;
 
-    return result
+    return result;
   }
 }

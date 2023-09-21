@@ -1,1 +1,1 @@
-export type Position = number
+export type Position = number;

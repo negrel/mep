@@ -1,4 +1,4 @@
-import { Position } from './position'
+import { Position } from "./position.ts";
 
 export enum TokenType {
   EOF,
@@ -10,12 +10,12 @@ export enum TokenType {
   OPERATOR, // Special characters
 
   LPAREN, // (
-  RPAREN // )
+  RPAREN, // )
 }
 
 export interface Token {
-  type: TokenType
-  start: Position
-  end: Position
-  value: string
+  type: TokenType;
+  start: Position;
+  end: Position;
+  value: string;
 }
