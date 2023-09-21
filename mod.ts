@@ -1,7 +1,18 @@
-export { compute } from "./src/compute.ts";
-export { Lexer } from "./src/lexer.ts";
-export { Parser } from "./src/parser.ts";
-export { registerOperator } from "./src/operator.ts";
-export { registerFunc } from "./src/func.ts";
-export { registerConstant } from "./src/constant.ts";
-export { type Token, TokenType } from "./src/tokens.ts";
+import { compute } from "./src/compute.ts";
+import { Lexer } from "./src/lexer.ts";
+import { Parser } from "./src/parser.ts";
+import { registerOperator } from "./src/operator.ts";
+import { registerFunc } from "./src/func.ts";
+import { registerConstant } from "./src/constant.ts";
+import { TokenType } from "./src/tokens.ts";
+export type { Token } from "./src/tokens.ts";
+
+export default {
+  compute,
+  Lexer,
+  Parser,
+  registerOperator,
+  registerFunc,
+  registerConstant,
+  TokenType,
+};
